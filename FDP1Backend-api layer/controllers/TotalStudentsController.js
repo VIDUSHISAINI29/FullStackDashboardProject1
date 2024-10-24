@@ -3,6 +3,7 @@ const { Database } = pkg;
 const db = new Database(":memory:");
 
 export async function getTotalStudents(req, res) {
+    const {year} = req.body;
     let connection; // Declare connection at the top of the function
     try {
         connection = db.connect(); // Connect to the database
@@ -18,7 +19,7 @@ export async function getTotalStudents(req, res) {
                 }
                 
                 // Query to get the count of students
-                connection.all("SELECT CAST(COUNT(Student_ID) AS INTEGER) AS total FROM Total_Students WHERE Year_Of_Result = '2019'", (err, rows) => {
+                connection.all("SELECT CAST(COUNT(Student_ID) AS INTEGER) AS total FROM Total_Students WHERE Year_Of_Result = ?", [year], (err, rows) => {
                     if (err) {
                         console.error("Error executing query:", err);
                         return reject(err);

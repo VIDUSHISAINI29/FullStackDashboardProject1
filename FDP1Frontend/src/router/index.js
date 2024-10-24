@@ -40,16 +40,16 @@ const router = createRouter({
    ],
 });
 
-router.beforeResolve(async (to, from, next) => {
-   const { isAuthenticated } = useAuth0();
-   if(to.meta.requiresAuth && !isAuthenticated.value)
-   {
-      console.log('user is not true. redirecting to login...');
-      next({name: "logIn"})
-   }
-   else{
-      next();
-   }
-})
+// router.beforeResolve(async (to, from, next) => {
+//    const { isAuthenticated } = useAuth0();
+//    if(to.meta.requiresAuth && !isAuthenticated.value)
+//    {
+//       console.log('user is not true. redirecting to login...');
+//       next({name: "logIn"})
+//    }
+//    else{
+//       next();
+//    }
+// })
 
 export default router;

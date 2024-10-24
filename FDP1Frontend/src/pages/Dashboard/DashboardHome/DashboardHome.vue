@@ -1,6 +1,6 @@
 <script setup>
 
-import { onMounted, reactive, ref, defineAsyncComponent } from "vue";
+import { onMounted, reactive, ref, defineAsyncComponent, watch } from "vue";
 import axios from "axios";
 
 import { useGlobalStore } from "@/stores/global";
@@ -26,19 +26,10 @@ const optionsStuPerDepartment = ref(null);
 
 
 
-// let today = new Date('01-01-2016');
-// // let month = today.getMonth();
-// // let year = today.getFullYear();
 
-// const yearAsParams = ref(null);
-// const minDate = ref(new Date());
-// const maxDate = ref(new Date());
 
-// minDate.value = '2016'
-// maxDate.value = '2022'
-
-// const empDepartmentNameArray = ref(null);
-// const numberOfEmployees = ref(null)
+const yearAsParams = ref(null);
+const date = ref(null);
 
 const employeePerDepartment = ref(null);
 
@@ -51,9 +42,9 @@ function displaySidebarFalse() {
    console.log(global.isSideBarVisible);
 }
 
-const fetchData = async (api) => {
+const fetchData = async (api, params) => {
    try {
-      const result = await axios.post(api);
+      const result = await axios.post(api, params);
       return result.data;
    } catch (error) {
       console.log("error in fetching api", error);
@@ -132,6 +123,12 @@ const graphRankingDepartments = async (departmentsNumber) => {
             itemStyle: {
                color: "#5d4bb9",
             },
+            label: {
+               show: true, // Enable the label
+               position: "top", // Position the label above the triangle
+               formatter: '{c}', // Use the value from emp_data as the label
+               color: '#000', // Optional: Set label color
+            }
          },
       ],
    };
@@ -253,6 +250,12 @@ const graphEmployeesPerDepartment = async () => {
                borderColor: "#f67e59",
                color: "#f67e59",
             },
+            label: {
+               show: true, // Enable the label
+               position: "top", // Position the label above the triangle
+               formatter: '{c}', // Use the value from emp_data as the label
+               color: '#000', // Optional: Set label color
+            }
          },
       ],
    };
@@ -267,7 +270,6 @@ const graphStudentsPerDepartment = async () => {
          };
       })
       .slice(0, 7);
-   console.log("i am finalData", finalData);
 
    optionsStuPerDepartment.value = {
       tooltip: {
@@ -308,8 +310,10 @@ const graphStudentsPerDepartment = async () => {
                borderWidth: 2,
             },
             label: {
-               show: false,
-               position: "center",
+               show: true, // Enable the label
+               position: "top", // Position the label above the triangle
+               formatter: '{c}', // Use the value from emp_data as the label
+               color: '#000', // Optional: Set label color
             },
             emphasis: {
                label: {
@@ -332,13 +336,36 @@ async function getTopper() {
       .map((arr) => arr.Student_ID)
       .slice(0, 1)[0];
 }
+const yearForQuery = ref(null);
 
-onMounted(async () => {
+watch(yearAsParams, async (newValue, oldValue) => {
+
+   console.log(`myVariable changed from ${oldValue} to ${newValue}`);
+   date.value = yearAsParams.value.getFullYear().toString()
+   console.log('date just is ',date.value);
+
+  
+ await refreshDashboard()
+   
+})
+
+const minDate = ref(new Date('2016'));// Start of 2000
+const maxDate = ref(new Date('2022')); // End of 2025
+
+async function refreshDashboard(){
+   
+   yearForQuery.value = {
+   year: date.value || '2021',
+}
+console.log('years as parameter is ',yearForQuery.value)
    rankdedDepartmentsData.value = await fetchData(
       `${import.meta.env.VITE_BACKEND_URL}/departments`,
+      yearForQuery.value
    );
+
    totalStudents.value = await fetchData(
       `${import.meta.env.VITE_BACKEND_URL}/students`,
+      yearForQuery.value
    );
    employeePerDepartment.value = await fetchData(
       `${import.meta.env.VITE_BACKEND_URL}/employees-per-department`,
@@ -348,15 +375,19 @@ onMounted(async () => {
    );
    studentsPerDepartment.value = await fetchData(
       `${import.meta.env.VITE_BACKEND_URL}/students-per-department`,
+      yearForQuery.value
    );
-   //    employeeCountDirect.value = employeeCount.value[0]
-   //    console.log(employeeCountDirect.value);
-
    await graphRankingDepartments(10);
    await graphTotalStudents();
    await graphEmployeesPerDepartment();
    await getTopper();
    await graphStudentsPerDepartment();
+  
+}
+
+onMounted(async () => {
+ 
+ await refreshDashboard()
 });
 </script>
 
@@ -364,8 +395,26 @@ onMounted(async () => {
    <div class="tw-relative tw-w-full">
       <!-- <DashboardSidebar /> -->
       
-      <div class="tw-flex tw-w-full tw-flex-col">
-       
+      <div class="tw-flex tw-w-full tw-flex-col tw-items-center">
+
+
+
+          <div class="tw-flex tw-h-24 tw-mt-10 tw-flex-col tw-justify-center tw-items-center tw-rounded-xl tw-bg-gradient-to-br tw-from-[#44c4f3] tw-to-[#4e86cf] tw-p-2 tw-w-40 md:tw-w-72">
+    <span class="tw-text-white tw-font-semibold">Select Year</span>
+    <DatePicker
+    class="tw-w-52"
+        clearIcon
+        v-model="yearAsParams"
+        yearRange="2016:2022"
+        :minDate="minDate"
+        :maxDate="maxDate"
+        view="year"
+        placeholder="Select"
+        dateFormat="yyyy"
+        :manualInput="false"
+      />
+  </div>
+        
          <div
             class="KpiContainer tw-m-10 tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-gap-5 tw-p-1 sm:tw-gap-10 md:tw-flex md:tw-flex-nowrap">
             <div
@@ -373,6 +422,7 @@ onMounted(async () => {
                <span
                   class="tw-text-center tw-text-xl tw-font-semibold tw-text-white">
                   {{ totalStudents }}
+                
                   <br />
                   Total Students
                </span>
@@ -398,7 +448,7 @@ onMounted(async () => {
             <div
                class="tw-flex tw-h-28 tw-w-48 tw-flex-col tw-justify-center tw-rounded-xl tw-bg-gradient-to-br tw-from-[#ea4582] tw-to-[#ba53a6] tw-p-2 lg:tw-w-52">
                <span
-                  class="tw-text-center tw-text-xl tw-font-semibold tw-text-white">
+                  class="tw-text-center tw-text-base tw-font-semibold tw-text-white">
                   {{ topDepartment }}
                   <br />
                   Top Department
@@ -426,16 +476,16 @@ onMounted(async () => {
          <div
             class="tw-flex tw-w-full tw-items-center tw-justify-center tw-gap-10">
             <div
-               class="tw-hidden tw-h-40 tw-w-[340px] tw-rounded-2xl tw-bg-[#e14a8d] tw-p-2 tw-text-center tw-text-lg tw-text-white lg:tw-flex lg:tw-items-center">
+               class="tw-hidden tw-h-40 tw-w-[340px] tw-rounded-2xl tw-bg-[#e14a8d] tw-p-2 tw-text-center tw-text-base tw-text-white lg:tw-flex lg:tw-items-center">
                <span>
                   Highest Percentage is achieved by the student of
                   <br />
-                  <span class="tw-text-2xl tw-font-semibold">
+                  <span class="tw-text-lg tw-font-semibold">
                      {{ topDepartment }}
                   </span>
                   department in the year
                   <br />
-                  <span class="tw-text-2xl tw-font-semibold">
+                  <span class="tw-text-lg tw-font-semibold">
                      {{ resultYear }}
                   </span>
                   .

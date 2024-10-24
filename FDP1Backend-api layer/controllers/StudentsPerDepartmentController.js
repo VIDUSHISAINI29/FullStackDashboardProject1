@@ -3,7 +3,7 @@ const { Database } = pkg;
 const db = new Database(":memory:");
 
 export async function getStudentsPerDepartment(req, res) {
-    // const yearOfResult = req.body.year
+    const {year} = req.body;
     let connection; // Declare connection at the top of the function
     try {
         connection = db.connect(); // Connect to the database
@@ -21,8 +21,9 @@ export async function getStudentsPerDepartment(req, res) {
                     connection.all(
                         `SELECT sma.Department_ID, sma.Department_Name, COUNT(sma.Student_ID) AS Students_Count , sma.Year_Of_Result
                         FROM Students_Per_Department sma 
-                        where Year_Of_Result = '2021'
+                        where Year_Of_Result = ?
                         GROUP BY sma.Department_ID, sma.Department_Name, sma.Year_Of_Result`, 
+                        [year],
                         (err, rows) => {
                             if (err) {
                                 console.error('Error in querying Students_Per_Department', err);

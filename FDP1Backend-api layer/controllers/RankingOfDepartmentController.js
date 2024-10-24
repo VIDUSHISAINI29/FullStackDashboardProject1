@@ -4,6 +4,7 @@ const db = new Database(":memory:");
 
 // Function to fetch ranked departments
 export async function getRankedDepartments(req, res) {
+    const { year } = req.body;
     try {
         const rows = await new Promise((resolve, reject) => {
             const connection = db.connect();
@@ -17,7 +18,9 @@ export async function getRankedDepartments(req, res) {
                         return reject(err);
                     }
 
-                    connection.all("SELECT * FROM Marks_Analysis_Table Where Year_Of_Result = '2017'", (err, rows) => {
+                    connection.all("SELECT * FROM Marks_Analysis_Table Where Year_Of_Result = ?",
+                        [year],
+                        (err, rows) => {
                         if (err) {
                             console.log("Error in querying parquet file", err);
                             return reject(err);
