@@ -1,5 +1,5 @@
 import duckdb
-connection = duckdb.connect(':memory:');
+connection = duckdb.connect(':memory:')
 
 # CSV files path
 employeeCsvPath = "D:/VS Code/FullStackDashboardsProject/FullStackDashboardProject1/FDP1Backend(ETL layer)/data/raw/Employee_Information.csv"

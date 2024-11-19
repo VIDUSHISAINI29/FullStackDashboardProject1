@@ -10,7 +10,7 @@ export async function getEmployeesCount(req, res) {
             // Create table from parquet
             connection.run(
                 "CREATE TABLE IF NOT EXISTS Employees_Count AS SELECT * FROM read_parquet('ParquetFiles/Employees_Count.parquet')",
-                (err) => {
+                (err) => { 
                     if (err) {
                         console.error('Error in reading Employees_Count parquet', err);
                         return reject(err);
