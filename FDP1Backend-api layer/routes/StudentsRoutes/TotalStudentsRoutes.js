@@ -1,6 +1,6 @@
 import {Router} from "express";
 
-import {getTotalStudents} from "../controllers/TotalStudentsController.js";
+import {getTotalStudents} from "../../controllers/TotalStudentsController.js";
 
 const router = Router();
 

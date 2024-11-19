@@ -21,18 +21,22 @@ app.use(
 // JSON Middleware
 app.use(express.json());
 
-// Routes
-import departmentsRoutes from './routes/RankingOfDepartmentRoutes.js';
-import studentsRoutes from './routes/TotalStudentsRoutes.js';
-import employeesPerDepartmentRoutes from './routes/EmployeesPerDepartmentRoutes.js';
-import employeesCountRoutes from './routes/EmployeesCountRoute.js';
-import studentsPerDepartmentRoutes from "./routes/StudentsPerDepartmentRoute.js";
+import routes from './routes/index.js'
 
-app.use("/departments", departmentsRoutes);
-app.use("/students", studentsRoutes);
-app.use("/employees-per-department", employeesPerDepartmentRoutes);
-app.use("/students-per-department", studentsPerDepartmentRoutes);
-app.use("/employees-count", employeesCountRoutes);
+// // Routes
+// import departmentsRoutes from './routes/RankingOfDepartmentRoutes.js';
+// import studentsRoutes from './routes/TotalStudentsRoutes.js';
+// import employeesPerDepartmentRoutes from './routes/EmployeesPerDepartmentRoutes.js';
+// import employeesCountRoutes from './routes/EmployeesCountRoute.js';
+// import studentsPerDepartmentRoutes from "./routes/StudentsPerDepartmentRoute.js";
+
+// app.use("/departments", departmentsRoutes);
+// app.use("/students", studentsRoutes);
+// app.use("/employees-per-department", employeesPerDepartmentRoutes);
+// app.use("/students-per-department", studentsPerDepartmentRoutes);
+// app.use("/employees-count", employeesCountRoutes);
+
+app.use(routes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
